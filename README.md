@@ -7,6 +7,19 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+## API Documentation
+
+This project uses Scramble to generate the OpenAPI document and Scalar to render the API reference UI.
+
+- Scalar UI: `/docs/api`
+- OpenAPI JSON: `/docs/openapi.json`
+
+Notes:
+
+- The OpenAPI document generation reads the MySQL schema.
+- If you run the app through Sail, the current `.env` database host (`mysql`) is correct.
+- If you run the app directly on the host machine, use the host-mapped MySQL connection instead, which is `127.0.0.1:3307` in the current `compose.yaml`.
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:

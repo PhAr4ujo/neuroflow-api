@@ -1,8 +1,6 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
-use App\Http\Resources\UserResource;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function (): void {
@@ -26,6 +24,4 @@ Route::prefix('auth')->group(function (): void {
     });
 });
 
-Route::get('/user', function (Request $request) {
-    return UserResource::make($request->user());
-})->middleware('auth:sanctum');
+Route::get('/user', [AuthController::class, 'currentUser'])->middleware('auth:sanctum');
