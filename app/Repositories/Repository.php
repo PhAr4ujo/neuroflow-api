@@ -13,6 +13,11 @@ abstract class Repository implements IRepository
         $this->model = app($this->model());
     }
 
+    public function create($data)
+    {
+        return $this->model->create($data);
+    }
+
     public function listRecords(array $filters, int $paginationAmount)
     {
         $query = $this->model->query();
@@ -28,7 +33,7 @@ abstract class Repository implements IRepository
 
     public function insert($data)
     {
-        return $this->model->create($data);
+        return $this->create($data);
     }
 
     public function edit($id, $data)
