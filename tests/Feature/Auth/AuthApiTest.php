@@ -133,7 +133,15 @@ class AuthApiTest extends TestCase
 
         $response->assertOk();
 
-        Notification::assertSentTo($user, ResetPassword::class);
+        Notification::assertSentTo($user, ResetPassword::class, function (ResetPassword $notification) use ($user): bool {
+            $actionUrl = $notification->toMail($user)->actionUrl;
+            parse_str(parse_url($actionUrl, PHP_URL_QUERY) ?: '', $query);
+
+            return str_starts_with(
+                $actionUrl,
+                Config::get('app.frontend_url').'/auth/reset-password/'.rawurlencode($notification->token),
+            ) && ($query['email'] ?? null) === $user->email;
+        });
     }
 
     public function test_user_can_reset_password_and_existing_tokens_are_revoked(): void

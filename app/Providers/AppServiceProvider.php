@@ -5,6 +5,7 @@ namespace App\Providers;
 use Dedoc\Scramble\Scramble;
 use Dedoc\Scramble\Support\Generator\OpenApi;
 use Dedoc\Scramble\Support\Generator\SecurityScheme;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
@@ -40,6 +41,15 @@ class AppServiceProvider extends ServiceProvider
             $frontendUrl = rtrim((string) config('app.frontend_url'), '/')."/auth/email/verify/{$id}/{$hash}";
 
             return $query ? "{$frontendUrl}?{$query}" : $frontendUrl;
+        });
+
+        ResetPassword::createUrlUsing(function (object $notifiable, string $token): string {
+            $frontendUrl = rtrim((string) config('app.frontend_url'), '/').'/auth/reset-password/'.rawurlencode($token);
+            $query = http_build_query([
+                'email' => $notifiable->getEmailForPasswordReset(),
+            ]);
+
+            return "{$frontendUrl}?{$query}";
         });
 
         Scramble::configure()
