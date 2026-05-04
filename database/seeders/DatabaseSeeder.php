@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         $this->call(ProfileSeeder::class);
+        $this->call(ItemSeeder::class);
 
         User::factory()->create([
             'name' => 'Test User',

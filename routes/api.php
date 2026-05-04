@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -26,6 +27,7 @@ Route::prefix('auth')->group(function (): void {
 });
 
 Route::middleware('auth:sanctum')->group(function (): void {
+    Route::apiResource('items', ItemController::class)->only(['index', 'show']);
     Route::apiResource('profiles', ProfileController::class)->only(['index', 'show']);
     Route::get('/user', [AuthController::class, 'currentUser']);
 });
