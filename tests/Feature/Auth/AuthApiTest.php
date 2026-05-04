@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
@@ -34,7 +35,14 @@ class AuthApiTest extends TestCase
         $user = User::query()->where('email', 'jane@example.com')->firstOrFail();
 
         $this->assertNull($user->email_verified_at);
-        Notification::assertSentTo($user, VerifyEmail::class);
+        Notification::assertSentTo($user, VerifyEmail::class, function (VerifyEmail $notification) use ($user): bool {
+            $mailMessage = $notification->toMail($user);
+
+            return str_starts_with(
+                $mailMessage->actionUrl,
+                Config::get('app.frontend_url')."/auth/email/verify/{$user->id}/".sha1($user->email),
+            );
+        });
     }
 
     public function test_verified_user_can_login_and_receive_a_sanctum_token(): void
@@ -103,7 +111,8 @@ class AuthApiTest extends TestCase
             [
                 'id' => $user->id,
                 'hash' => sha1($user->email),
-            ]
+            ],
+            false,
         );
 
         $response = $this->getJson($this->toRelativeUrl($verificationUrl));
