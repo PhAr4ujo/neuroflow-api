@@ -139,6 +139,7 @@ class AuthController extends Controller
     {
         /** @var User $user */
         $user = $request->user();
+        $user->loadMissing('profile');
 
         return new UserResource($user);
     }

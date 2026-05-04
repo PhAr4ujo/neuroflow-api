@@ -2,7 +2,9 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Models\Profile;
 use App\Models\User;
+use Database\Seeders\ProfileSeeder;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -17,6 +19,13 @@ class AuthApiTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->seed(ProfileSeeder::class);
+    }
+
     public function test_user_can_register_and_receive_verification_email(): void
     {
         Notification::fake();
@@ -30,11 +39,13 @@ class AuthApiTest extends TestCase
 
         $response
             ->assertCreated()
-            ->assertJsonPath('data.email', 'jane@example.com');
+            ->assertJsonPath('data.email', 'jane@example.com')
+            ->assertJsonPath('data.profile.slug', Profile::USER_SLUG);
 
         $user = User::query()->where('email', 'jane@example.com')->firstOrFail();
 
         $this->assertNull($user->email_verified_at);
+        $this->assertSame(Profile::USER_SLUG, $user->profile->slug);
         Notification::assertSentTo($user, VerifyEmail::class, function (VerifyEmail $notification) use ($user): bool {
             $mailMessage = $notification->toMail($user);
 
@@ -60,11 +71,12 @@ class AuthApiTest extends TestCase
         $response
             ->assertOk()
             ->assertJsonPath('token_type', 'Bearer')
+            ->assertJsonPath('user.profile.slug', Profile::USER_SLUG)
             ->assertJsonStructure([
                 'message',
                 'access_token',
                 'token_type',
-                'user' => ['id', 'name', 'email'],
+                'user' => ['id', 'profile' => ['id', 'name', 'slug'], 'name', 'email'],
             ]);
 
         $this->assertDatabaseCount('personal_access_tokens', 1);

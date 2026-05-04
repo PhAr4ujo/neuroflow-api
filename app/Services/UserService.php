@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Models\Profile;
 use App\Models\User;
+use App\Repositories\Interfaces\IProfileRepository;
 use App\Repositories\Interfaces\IUserRepository;
 use App\Services\Interfaces\IUserService;
 use Illuminate\Auth\Events\PasswordReset;
@@ -12,23 +14,35 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
+use RuntimeException;
 
 class UserService extends Service implements IUserService
 {
     public function __construct(
         private readonly IUserRepository $userRepository,
+        private readonly IProfileRepository $profileRepository,
     ) {
         parent::__construct($userRepository);
     }
 
     public function register(array $data): User
     {
-        $user = DB::transaction(fn (): User => $this->userRepository->create(
-            Arr::only($data, ['name', 'email', 'password'])
-        ));
+        $user = DB::transaction(function () use ($data): User {
+            $userProfile = $this->profileRepository->findBySlug(Profile::USER_SLUG);
+
+            if (! $userProfile) {
+                throw new RuntimeException('The default User profile has not been seeded.');
+            }
+
+            return $this->userRepository->create([
+                ...Arr::only($data, ['name', 'email', 'password']),
+                'profile_id' => $userProfile->id,
+            ]);
+        });
 
         $user->sendEmailVerificationNotification();
         $user->refresh();
+        $user->loadMissing('profile');
 
         return $user;
     }
@@ -48,6 +62,8 @@ class UserService extends Service implements IUserService
                 'email' => ['Your email address is not verified.'],
             ]);
         }
+
+        $user->loadMissing('profile');
 
         $token = $this->userRepository->createAccessToken(
             $user,
@@ -102,6 +118,7 @@ class UserService extends Service implements IUserService
         }
 
         $user->refresh();
+        $user->loadMissing('profile');
 
         return $user;
     }
