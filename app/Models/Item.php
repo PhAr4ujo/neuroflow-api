@@ -6,6 +6,7 @@ use Database\Factories\ItemFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 #[Fillable(['name', 'route'])]
 class Item extends Model
@@ -24,5 +25,13 @@ class Item extends Model
             ['name' => 'Flows', 'route' => '/flows'],
             ['name' => 'Settings', 'route' => 'settings'],
         ];
+    }
+
+    /**
+     * @return BelongsToMany<Profile, $this>
+     */
+    public function profiles(): BelongsToMany
+    {
+        return $this->belongsToMany(Profile::class)->withTimestamps();
     }
 }
