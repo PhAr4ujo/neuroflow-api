@@ -21,6 +21,10 @@ class UserController extends Controller
 
     /**
      * List all users.
+     *
+     * Authorization rules:
+     * - Admin profile: can list every user.
+     * - User profile: cannot list users. Use `GET /api/user` or `GET /api/users/{user}` for the authenticated user instead.
      */
     public function index(): AnonymousResourceCollection
     {
@@ -29,6 +33,12 @@ class UserController extends Controller
 
     /**
      * Create a user.
+     *
+     * Authorization rules:
+     * - Admin profile: can create users and set `profile_id`, `email`, and `email_verified_at`.
+     * - User profile: cannot create users.
+     *
+     * When `profile_id` is omitted, the user is created with the default User profile.
      */
     public function store(StoreUserRequest $request): UserResource
     {
@@ -39,6 +49,12 @@ class UserController extends Controller
 
     /**
      * Show a user.
+     *
+     * Authorization rules:
+     * - Admin profile: can view any user.
+     * - User profile: can view only itself.
+     *
+     * The response includes the user's profile, email verification date, and timestamps.
      */
     public function show(User $user): UserResource
     {
@@ -49,6 +65,12 @@ class UserController extends Controller
 
     /**
      * Update a user.
+     *
+     * Authorization rules:
+     * - Admin profile: can update any user and may edit `name`, `password`, `profile_id`, `email`, and `email_verified_at`.
+     * - User profile: can update only itself and may edit only `name` and `password`.
+     *
+     * For non-admin users, any submitted `profile_id`, `email`, or `email_verified_at` fields are ignored by validation and are not changed.
      */
     public function update(UpdateUserRequest $request, User $user): UserResource
     {
@@ -59,6 +81,12 @@ class UserController extends Controller
 
     /**
      * Delete a user.
+     *
+     * Authorization rules:
+     * - Admin profile: can delete users.
+     * - User profile: cannot delete users, including itself.
+     *
+     * Deleting a user also revokes all of that user's access tokens.
      */
     public function destroy(User $user): HttpResponse
     {

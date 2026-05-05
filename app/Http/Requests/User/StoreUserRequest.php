@@ -21,10 +21,25 @@ class StoreUserRequest extends FormRequest
     public function rules(): array
     {
         return [
+            /**
+             * Profile assigned to the new user. Admin-only. When omitted, the default User profile is used.
+             */
             'profile_id' => ['sometimes', 'nullable', Rule::exists('profiles', 'id')],
+            /**
+             * Display name for the user.
+             */
             'name' => ['required', 'string', 'max:255'],
+            /**
+             * Login email for the user. Admin-only on user creation and must be unique.
+             */
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')],
+            /**
+             * Email verification timestamp. Admin-only. Send `null` or omit it to keep the user unverified.
+             */
             'email_verified_at' => ['sometimes', 'nullable', 'date'],
+            /**
+             * User password. Must be confirmed with `password_confirmation`.
+             */
             'password' => ['required', 'string', 'confirmed', Password::min(8)],
         ];
     }
