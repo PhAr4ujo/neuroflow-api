@@ -9,6 +9,7 @@ use App\Repositories\Interfaces\IUserRepository;
 use App\Services\Interfaces\IUserService;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Auth\Events\Verified;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -23,6 +24,65 @@ class UserService extends Service implements IUserService
         private readonly IProfileRepository $profileRepository,
     ) {
         parent::__construct($userRepository);
+    }
+
+    public function getAllUsers(): Collection
+    {
+        return $this->userRepository->getAllWithProfile();
+    }
+
+    public function createUser(array $data): User
+    {
+        $user = DB::transaction(function () use ($data): User {
+            if (! array_key_exists('profile_id', $data)) {
+                $userProfile = $this->profileRepository->findBySlug(Profile::USER_SLUG);
+
+                if (! $userProfile) {
+                    throw new RuntimeException('The default User profile has not been seeded.');
+                }
+
+                $data['profile_id'] = $userProfile->id;
+            }
+
+            return $this->userRepository->create(Arr::only($data, [
+                'profile_id',
+                'name',
+                'email',
+                'email_verified_at',
+                'password',
+            ]));
+        });
+
+        $user->loadMissing('profile');
+
+        return $user;
+    }
+
+    public function updateUser(User $user, array $data): User
+    {
+        DB::transaction(function () use ($user, $data): void {
+            $this->userRepository->updateUser($user, Arr::only($data, [
+                'profile_id',
+                'name',
+                'email',
+                'email_verified_at',
+                'password',
+            ]));
+        });
+
+        $user->refresh();
+        $user->loadMissing('profile');
+
+        return $user;
+    }
+
+    public function deleteUser(User $user): bool
+    {
+        return DB::transaction(function () use ($user): bool {
+            $this->userRepository->deleteAccessTokens($user);
+
+            return $this->userRepository->deleteUser($user);
+        });
     }
 
     public function register(array $data): User

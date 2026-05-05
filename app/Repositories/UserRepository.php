@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\User;
 use App\Repositories\Interfaces\IUserRepository;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\NewAccessToken;
 
@@ -12,6 +13,13 @@ class UserRepository extends Repository implements IUserRepository
     public function model(): string
     {
         return User::class;
+    }
+
+    public function getAllWithProfile(): Collection
+    {
+        return $this->model->newQuery()
+            ->with('profile')
+            ->get();
     }
 
     public function findByEmail(string $email): ?User
@@ -45,5 +53,15 @@ class UserRepository extends Repository implements IUserRepository
             'password' => $password,
             'remember_token' => Str::random(60),
         ])->save();
+    }
+
+    public function updateUser(User $user, array $data): bool
+    {
+        return $user->update($data);
+    }
+
+    public function deleteUser(User $user): bool
+    {
+        return (bool) $user->delete();
     }
 }

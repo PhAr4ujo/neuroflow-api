@@ -8,7 +8,6 @@ use App\Models\User;
 use App\Services\Interfaces\IItemService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Symfony\Component\HttpFoundation\Response;
 
 class ItemController extends Controller
 {
@@ -21,12 +20,10 @@ class ItemController extends Controller
      */
     public function index(Request $request): AnonymousResourceCollection
     {
+        $this->authorize('viewAny', Item::class);
+
         /** @var User $user */
         $user = $request->user();
-
-        if (! $user->profile_id) {
-            abort(Response::HTTP_FORBIDDEN);
-        }
 
         return ItemResource::collection($this->itemService->getByProfile($user->profile_id));
     }
@@ -34,20 +31,9 @@ class ItemController extends Controller
     /**
      * Show an item allowed for the authenticated user's profile.
      */
-    public function show(Request $request, Item $item): ItemResource
+    public function show(Item $item): ItemResource
     {
-        /** @var User $user */
-        $user = $request->user();
-
-        if (! $user->profile_id) {
-            abort(Response::HTTP_FORBIDDEN);
-        }
-
-        $item = $this->itemService->findByProfile($item->id, $user->profile_id);
-
-        if (! $item) {
-            abort(Response::HTTP_FORBIDDEN);
-        }
+        $this->authorize('view', $item);
 
         return new ItemResource($item);
     }

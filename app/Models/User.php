@@ -13,7 +13,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-#[Fillable(['profile_id', 'name', 'email', 'password'])]
+#[Fillable(['profile_id', 'name', 'email', 'email_verified_at', 'password'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -39,5 +39,20 @@ class User extends Authenticatable implements MustVerifyEmail
     public function profile(): BelongsTo
     {
         return $this->belongsTo(Profile::class);
+    }
+
+    public function isAdmin(): bool
+    {
+        if (! $this->profile_id) {
+            return false;
+        }
+
+        if ($this->relationLoaded('profile')) {
+            return $this->profile?->slug === Profile::ADMIN_SLUG;
+        }
+
+        return $this->profile()
+            ->where('slug', Profile::ADMIN_SLUG)
+            ->exists();
     }
 }

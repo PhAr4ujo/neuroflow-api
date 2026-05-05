@@ -18,6 +18,8 @@ class ProfileController extends Controller
      */
     public function index(): AnonymousResourceCollection
     {
+        $this->authorize('viewAny', Profile::class);
+
         return ProfileResource::collection($this->profileService->getAll());
     }
 
@@ -26,6 +28,8 @@ class ProfileController extends Controller
      */
     public function show(Profile $profile): ProfileResource
     {
+        $this->authorize('view', $profile);
+
         return new ProfileResource($profile);
     }
 }
