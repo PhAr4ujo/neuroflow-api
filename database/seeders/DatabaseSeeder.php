@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Profile;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -22,9 +23,16 @@ class DatabaseSeeder extends Seeder
         $this->call(ItemProfileSeeder::class);
         $this->call(ModeSeeder::class);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        $userProfile = Profile::query()->where('slug', Profile::USER_SLUG)->firstOrFail();
+
+        User::query()->updateOrCreate(
+            ['email' => 'test@example.com'],
+            [
+                'profile_id' => $userProfile->id,
+                'name' => 'Test User',
+                'email_verified_at' => now(),
+                'password' => 'password',
+            ],
+        );
     }
 }

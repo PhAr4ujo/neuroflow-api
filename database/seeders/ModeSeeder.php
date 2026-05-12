@@ -16,9 +16,9 @@ class ModeSeeder extends Seeder
             Mode::query()->updateOrCreate(
                 [
                     'name' => $mode['name'],
-                    'description' => $mode['description'],
+                    'color' => $mode['color'],
                 ],
-                ['color' => $mode['color']],
+                ['description' => $mode['description']],
             );
         }
     }

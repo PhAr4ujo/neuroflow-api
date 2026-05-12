@@ -42,6 +42,7 @@ class ItemApiTest extends TestCase
             ->assertJsonFragment(['name' => 'Users', 'route' => '/users'])
             ->assertJsonFragment(['name' => 'Core', 'route' => '/core'])
             ->assertJsonFragment(['name' => 'Flows', 'route' => '/flows'])
+            ->assertJsonFragment(['name' => 'Modes', 'route' => '/modes'])
             ->assertJsonFragment(['name' => 'Settings', 'route' => 'settings']);
     }
 
@@ -56,6 +57,7 @@ class ItemApiTest extends TestCase
             ->assertJsonMissing(['name' => 'Users', 'route' => '/users'])
             ->assertJsonFragment(['name' => 'Core', 'route' => '/core'])
             ->assertJsonFragment(['name' => 'Flows', 'route' => '/flows'])
+            ->assertJsonFragment(['name' => 'Modes', 'route' => '/modes'])
             ->assertJsonFragment(['name' => 'Settings', 'route' => 'settings']);
     }
 
@@ -78,15 +80,15 @@ class ItemApiTest extends TestCase
     {
         Sanctum::actingAs(User::factory()->create());
 
-        $item = Item::query()->where('name', 'Core')->firstOrFail();
+        $item = Item::query()->where('name', 'Modes')->firstOrFail();
 
         $response = $this->getJson("/api/items/{$item->id}");
 
         $response
             ->assertOk()
             ->assertJsonPath('id', $item->id)
-            ->assertJsonPath('name', 'Core')
-            ->assertJsonPath('route', '/core');
+            ->assertJsonPath('name', 'Modes')
+            ->assertJsonPath('route', '/modes');
     }
 
     public function test_user_cannot_view_an_unallowed_item(): void

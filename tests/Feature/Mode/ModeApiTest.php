@@ -58,17 +58,55 @@ class ModeApiTest extends TestCase
         $this->assertDatabaseCount('modes', 3);
         $this->assertDatabaseHas('modes', [
             'name' => 'Sleep',
-            'description' => 'Discreet beta pulses for distraction-free work blocks.',
+            'description' => 'Beta waves: discreet pulses for distraction-free work blocks.',
             'color' => '#6ee7d8',
         ]);
         $this->assertDatabaseHas('modes', [
             'name' => 'Relax',
-            'description' => 'Theta textures to slow down mental noise.',
+            'description' => 'Theta waves: textured ambience to slow down mental noise.',
             'color' => '#f6c177',
         ]);
         $this->assertDatabaseHas('modes', [
             'name' => 'Sleep',
+            'description' => 'Delta waves: automatic fade-out for falling asleep.',
+            'color' => '#b9a7ff',
+        ]);
+    }
+
+    public function test_mode_seeder_updates_existing_default_descriptions(): void
+    {
+        Mode::query()->create([
+            'name' => 'Sleep',
+            'description' => 'Discreet beta pulses for distraction-free work blocks.',
+            'color' => '#6ee7d8',
+        ]);
+        Mode::query()->create([
+            'name' => 'Relax',
+            'description' => 'Theta textures to slow down mental noise.',
+            'color' => '#f6c177',
+        ]);
+        Mode::query()->create([
+            'name' => 'Sleep',
             'description' => 'Delta waves with automatic fade-out for falling asleep.',
+            'color' => '#b9a7ff',
+        ]);
+
+        $this->seed(ModeSeeder::class);
+
+        $this->assertDatabaseCount('modes', 3);
+        $this->assertDatabaseHas('modes', [
+            'name' => 'Sleep',
+            'description' => 'Beta waves: discreet pulses for distraction-free work blocks.',
+            'color' => '#6ee7d8',
+        ]);
+        $this->assertDatabaseHas('modes', [
+            'name' => 'Relax',
+            'description' => 'Theta waves: textured ambience to slow down mental noise.',
+            'color' => '#f6c177',
+        ]);
+        $this->assertDatabaseHas('modes', [
+            'name' => 'Sleep',
+            'description' => 'Delta waves: automatic fade-out for falling asleep.',
             'color' => '#b9a7ff',
         ]);
     }
