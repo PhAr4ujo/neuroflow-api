@@ -54,14 +54,4 @@ class UserRepository extends Repository implements IUserRepository
             'remember_token' => Str::random(60),
         ])->save();
     }
-
-    public function updateUser(User $user, array $data): bool
-    {
-        return $user->update($data);
-    }
-
-    public function deleteUser(User $user): bool
-    {
-        return (bool) $user->delete();
-    }
 }

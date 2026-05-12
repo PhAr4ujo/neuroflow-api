@@ -26,7 +26,7 @@ class ModeService extends Service implements IModeService
 
     public function updateMode(Mode $mode, array $data): Mode
     {
-        $this->modeRepository->updateMode($mode, Arr::only($data, [
+        $this->edit($mode->id, Arr::only($data, [
             'name',
             'description',
             'color',
@@ -39,6 +39,6 @@ class ModeService extends Service implements IModeService
 
     public function deleteMode(Mode $mode): bool
     {
-        return $this->modeRepository->deleteMode($mode);
+        return $this->delete($mode->id);
     }
 }
