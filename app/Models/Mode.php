@@ -12,4 +12,28 @@ class Mode extends Model
 {
     /** @use HasFactory<ModeFactory> */
     use HasFactory;
+
+    /**
+     * @return array<int, array{name: string, description: string, color: string}>
+     */
+    public static function defaults(): array
+    {
+        return [
+            [
+                'name' => 'Sleep',
+                'description' => 'Discreet beta pulses for distraction-free work blocks.',
+                'color' => '#6ee7d8',
+            ],
+            [
+                'name' => 'Relax',
+                'description' => 'Theta textures to slow down mental noise.',
+                'color' => '#f6c177',
+            ],
+            [
+                'name' => 'Sleep',
+                'description' => 'Delta waves with automatic fade-out for falling asleep.',
+                'color' => '#b9a7ff',
+            ],
+        ];
+    }
 }

@@ -4,6 +4,7 @@ namespace Tests\Feature\Mode;
 
 use App\Models\Mode;
 use App\Models\User;
+use Database\Seeders\ModeSeeder;
 use Database\Seeders\ProfileSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
@@ -47,6 +48,29 @@ class ModeApiTest extends TestCase
             ->assertOk()
             ->assertJsonFragment(['name' => 'Focus', 'color' => '#3366FF'])
             ->assertJsonFragment(['name' => 'Calm', 'color' => '#22AA88']);
+    }
+
+    public function test_mode_seeder_creates_default_modes_idempotently(): void
+    {
+        $this->seed(ModeSeeder::class);
+        $this->seed(ModeSeeder::class);
+
+        $this->assertDatabaseCount('modes', 3);
+        $this->assertDatabaseHas('modes', [
+            'name' => 'Sleep',
+            'description' => 'Discreet beta pulses for distraction-free work blocks.',
+            'color' => '#6ee7d8',
+        ]);
+        $this->assertDatabaseHas('modes', [
+            'name' => 'Relax',
+            'description' => 'Theta textures to slow down mental noise.',
+            'color' => '#f6c177',
+        ]);
+        $this->assertDatabaseHas('modes', [
+            'name' => 'Sleep',
+            'description' => 'Delta waves with automatic fade-out for falling asleep.',
+            'color' => '#b9a7ff',
+        ]);
     }
 
     public function test_authenticated_user_can_view_a_mode(): void
