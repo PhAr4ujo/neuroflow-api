@@ -23,6 +23,7 @@ class Item extends Model
             ['name' => 'Users', 'route' => '/users'],
             ['name' => 'Core', 'route' => '/core'],
             ['name' => 'Flows', 'route' => '/flows'],
+            ['name' => 'Modes', 'route' => '/modes'],
             ['name' => 'Settings', 'route' => 'settings'],
         ];
     }

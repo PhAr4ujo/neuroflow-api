@@ -397,6 +397,207 @@
                 }
             }
         },
+        "/modes": {
+            "get": {
+                "operationId": "modes.index",
+                "summary": "List the available application modes",
+                "tags": [
+                    "Mode"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Array of `ModeResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ModeResource"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "modes.store",
+                "summary": "Create a mode",
+                "tags": [
+                    "Mode"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreModeRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`ModeResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ModeResource"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/modes/{mode}": {
+            "get": {
+                "operationId": "modes.show",
+                "summary": "Show an application mode",
+                "tags": [
+                    "Mode"
+                ],
+                "parameters": [
+                    {
+                        "name": "mode",
+                        "in": "path",
+                        "required": true,
+                        "description": "The mode ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`ModeResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ModeResource"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "modes.update",
+                "summary": "Update a mode",
+                "tags": [
+                    "Mode"
+                ],
+                "parameters": [
+                    {
+                        "name": "mode",
+                        "in": "path",
+                        "required": true,
+                        "description": "The mode ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateModeRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`ModeResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ModeResource"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "modes.destroy",
+                "summary": "Delete a mode",
+                "tags": [
+                    "Mode"
+                ],
+                "parameters": [
+                    {
+                        "name": "mode",
+                        "in": "path",
+                        "required": true,
+                        "description": "The mode ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/profiles": {
             "get": {
                 "operationId": "profiles.index",
@@ -793,6 +994,38 @@
                 ],
                 "title": "MessageResource"
             },
+            "ModeResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "color": {
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "type": "string"
+                    },
+                    "updated_at": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "description",
+                    "color",
+                    "created_at",
+                    "updated_at"
+                ],
+                "title": "ModeResource"
+            },
             "ProfileResource": {
                 "type": "object",
                 "properties": {
@@ -926,6 +1159,33 @@
                 ],
                 "title": "ResetPasswordTokenResource"
             },
+            "StoreModeRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "Display name for the mode.",
+                        "maxLength": 255
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Description for what the mode controls or represents."
+                    },
+                    "color": {
+                        "type": "string",
+                        "description": "Hex color used to represent the mode.",
+                        "pattern": "^#[0-9A-Fa-f]{6}$",
+                        "minLength": 7,
+                        "maxLength": 7
+                    }
+                },
+                "required": [
+                    "name",
+                    "description",
+                    "color"
+                ],
+                "title": "StoreModeRequest"
+            },
             "StoreUserRequest": {
                 "type": "object",
                 "properties": {
@@ -970,6 +1230,33 @@
                     "password_confirmation"
                 ],
                 "title": "StoreUserRequest"
+            },
+            "UpdateModeRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "Display name for the mode.",
+                        "maxLength": 255
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Description for what the mode controls or represents."
+                    },
+                    "color": {
+                        "type": "string",
+                        "description": "Hex color used to represent the mode.",
+                        "pattern": "^#[0-9A-Fa-f]{6}$",
+                        "minLength": 7,
+                        "maxLength": 7
+                    }
+                },
+                "required": [
+                    "name",
+                    "description",
+                    "color"
+                ],
+                "title": "UpdateModeRequest"
             },
             "UpdateUserRequest": {
                 "type": "object",

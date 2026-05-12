@@ -61,7 +61,7 @@ class UserService extends Service implements IUserService
     public function updateUser(User $user, array $data): User
     {
         DB::transaction(function () use ($user, $data): void {
-            $this->userRepository->updateUser($user, Arr::only($data, [
+            $this->edit($user->id, Arr::only($data, [
                 'profile_id',
                 'name',
                 'email',
@@ -81,7 +81,7 @@ class UserService extends Service implements IUserService
         return DB::transaction(function () use ($user): bool {
             $this->userRepository->deleteAccessTokens($user);
 
-            return $this->userRepository->deleteUser($user);
+            return $this->delete($user->id);
         });
     }
 

@@ -21,8 +21,4 @@ interface IUserRepository extends IRepository
     public function markEmailAsVerified(User $user): bool;
 
     public function updatePassword(User $user, string $password): bool;
-
-    public function updateUser(User $user, array $data): bool;
-
-    public function deleteUser(User $user): bool;
 }
