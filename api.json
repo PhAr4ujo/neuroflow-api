@@ -16,6 +16,255 @@
         }
     ],
     "paths": {
+        "/audios": {
+            "get": {
+                "operationId": "audios.index",
+                "summary": "List the available audios",
+                "tags": [
+                    "Audio"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Array of `AudioResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/AudioResource"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "audios.store",
+                "summary": "Create an audio",
+                "tags": [
+                    "Audio"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreAudioRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`AudioResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AudioResource"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/audios/{audio}": {
+            "get": {
+                "operationId": "audios.show",
+                "summary": "Show an audio",
+                "tags": [
+                    "Audio"
+                ],
+                "parameters": [
+                    {
+                        "name": "audio",
+                        "in": "path",
+                        "required": true,
+                        "description": "The audio ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`AudioResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AudioResource"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "put": {
+                "operationId": "audios.update",
+                "summary": "Update an audio",
+                "tags": [
+                    "Audio"
+                ],
+                "parameters": [
+                    {
+                        "name": "audio",
+                        "in": "path",
+                        "required": true,
+                        "description": "The audio ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateAudioRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "`AudioResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AudioResource"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "audios.destroy",
+                "summary": "Delete an audio",
+                "tags": [
+                    "Audio"
+                ],
+                "parameters": [
+                    {
+                        "name": "audio",
+                        "in": "path",
+                        "required": true,
+                        "description": "The audio ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AuthorizationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/modes/{mode}/audios": {
+            "get": {
+                "operationId": "audio.byMode",
+                "summary": "List the available audios for a mode",
+                "tags": [
+                    "Audio"
+                ],
+                "parameters": [
+                    {
+                        "name": "mode",
+                        "in": "path",
+                        "required": true,
+                        "description": "The mode ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Array of `AudioResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/AudioResource"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
         "/auth/register": {
             "post": {
                 "operationId": "auth.register",
@@ -891,6 +1140,44 @@
             }
         },
         "schemas": {
+            "AudioResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "path": {
+                        "type": "string"
+                    },
+                    "mode_id": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "mode": {
+                        "$ref": "#/components/schemas/ModeResource"
+                    },
+                    "created_at": {
+                        "type": "string"
+                    },
+                    "updated_at": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "path",
+                    "mode_id",
+                    "created_at",
+                    "updated_at"
+                ],
+                "title": "AudioResource"
+            },
             "ForgotPasswordRequest": {
                 "type": "object",
                 "properties": {
@@ -998,7 +1285,7 @@
                 "type": "object",
                 "properties": {
                     "id": {
-                        "type": "string"
+                        "type": "integer"
                     },
                     "name": {
                         "type": "string"
@@ -1159,6 +1446,35 @@
                 ],
                 "title": "ResetPasswordTokenResource"
             },
+            "StoreAudioRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "Display name for the audio. Must be unique.",
+                        "maxLength": 255
+                    },
+                    "mode_id": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "description": "Mode linked to this audio. Send `null` or omit it to keep the audio unassigned."
+                    },
+                    "file": {
+                        "type": "string",
+                        "format": "binary",
+                        "contentMediaType": "application/octet-stream",
+                        "description": "Audio file uploaded to Laravel storage. Maximum size is 200 MB.",
+                        "maxLength": 204800
+                    }
+                },
+                "required": [
+                    "name",
+                    "file"
+                ],
+                "title": "StoreAudioRequest"
+            },
             "StoreModeRequest": {
                 "type": "object",
                 "properties": {
@@ -1230,6 +1546,31 @@
                     "password_confirmation"
                 ],
                 "title": "StoreUserRequest"
+            },
+            "UpdateAudioRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "Display name for the audio. Must be unique.",
+                        "maxLength": 255
+                    },
+                    "mode_id": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "description": "Mode linked to this audio. Send `null` to remove the mode assignment."
+                    },
+                    "file": {
+                        "type": "string",
+                        "format": "binary",
+                        "contentMediaType": "application/octet-stream",
+                        "description": "Replacement audio file uploaded to Laravel storage. Maximum size is 200 MB.",
+                        "maxLength": 204800
+                    }
+                },
+                "title": "UpdateAudioRequest"
             },
             "UpdateModeRequest": {
                 "type": "object",

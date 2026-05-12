@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Repositories\AudioRepository;
+use App\Repositories\Interfaces\IAudioRepository;
 use App\Repositories\Interfaces\IItemRepository;
 use App\Repositories\Interfaces\IModeRepository;
 use App\Repositories\Interfaces\IProfileRepository;
@@ -19,6 +21,7 @@ class RepositoryServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->bind(IAudioRepository::class, AudioRepository::class);
         $this->app->bind(IItemRepository::class, ItemRepository::class);
         $this->app->bind(IModeRepository::class, ModeRepository::class);
         $this->app->bind(IProfileRepository::class, ProfileRepository::class);

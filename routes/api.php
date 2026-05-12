@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AudioController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ModeController;
@@ -29,7 +30,9 @@ Route::prefix('auth')->group(function (): void {
 });
 
 Route::middleware('auth:sanctum')->group(function (): void {
+    Route::apiResource('audios', AudioController::class);
     Route::apiResource('items', ItemController::class)->only(['index', 'show']);
+    Route::get('/modes/{mode}/audios', [AudioController::class, 'byMode']);
     Route::apiResource('modes', ModeController::class);
     Route::apiResource('profiles', ProfileController::class)->only(['index', 'show']);
     Route::apiResource('users', UserController::class);
