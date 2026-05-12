@@ -9,6 +9,7 @@ use Database\Seeders\ProfileSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -52,6 +53,8 @@ class AudioApiTest extends TestCase
             ->assertJsonFragment(['name' => 'Focus Track', 'path' => 'audios/focus-track.mp3'])
             ->assertJsonFragment(['name' => 'Neutral Track', 'path' => 'audios/neutral-track.mp3'])
             ->assertJsonFragment(['name' => 'Focus']);
+
+        $this->assertStringContainsString("/api/audios/{$response->json('data.0.id')}/stream?", $response->json('data.0.url'));
     }
 
     public function test_authenticated_user_can_list_audios_by_mode(): void
@@ -111,6 +114,8 @@ class AudioApiTest extends TestCase
             ->assertJsonPath('path', 'audios/rain-loop.mp3')
             ->assertJsonPath('mode.id', $mode->id)
             ->assertJsonPath('mode.name', 'Calm');
+
+        $this->assertStringContainsString("/api/audios/{$audio->id}/stream?", $response->json('url'));
     }
 
     public function test_regular_user_cannot_create_update_or_delete_audios(): void
@@ -166,6 +171,7 @@ class AudioApiTest extends TestCase
 
         $this->assertIsString($path);
         $this->assertStringStartsWith('audios/', $path);
+        $this->assertStringContainsString("/api/audios/{$response->json('id')}/stream?", $response->json('url'));
         Storage::disk($this->audioDisk())->assertExists($path);
 
         $this->assertDatabaseHas('audios', [
@@ -173,6 +179,30 @@ class AudioApiTest extends TestCase
             'path' => $path,
             'mode_id' => $mode->id,
         ]);
+    }
+
+    public function test_signed_audio_stream_supports_byte_ranges(): void
+    {
+        Storage::fake($this->audioDisk());
+
+        $audio = Audio::factory()->create([
+            'path' => 'audios/range-test.mp4',
+        ]);
+        Storage::disk($this->audioDisk())->put($audio->path, '0123456789');
+
+        $url = URL::temporarySignedRoute('audios.stream', now()->addMinutes(5), [
+            'audio' => $audio->id,
+        ]);
+
+        $response = $this->withHeader('Range', 'bytes=2-5')->get($url);
+
+        $response
+            ->assertStatus(206)
+            ->assertHeader('Accept-Ranges', 'bytes')
+            ->assertHeader('Content-Range', 'bytes 2-5/10')
+            ->assertHeader('Content-Length', '4');
+
+        $this->assertSame('2345', $response->streamedContent());
     }
 
     public function test_admin_can_update_an_audio_and_replace_the_file(): void

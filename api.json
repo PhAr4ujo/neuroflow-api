@@ -16,6 +16,73 @@
         }
     ],
     "paths": {
+        "/audios/{audio}/stream": {
+            "get": {
+                "operationId": "audios.stream",
+                "summary": "Stream an audio file",
+                "tags": [
+                    "Audio"
+                ],
+                "parameters": [
+                    {
+                        "name": "audio",
+                        "in": "path",
+                        "required": true,
+                        "description": "The audio ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "206": {
+                        "description": "",
+                        "content": {
+                            "text/html": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "headers": {
+                            "Transfer-Encoding": {
+                                "required": true,
+                                "schema": {
+                                    "type": "string",
+                                    "enum": [
+                                        "chunked"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "416": {
+                        "description": "",
+                        "headers": {
+                            "Accept-Ranges": {
+                                "schema": {
+                                    "type": "string",
+                                    "const": "bytes"
+                                }
+                            },
+                            "Content-Disposition": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Content-Range": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    }
+                }
+            }
+        },
         "/audios": {
             "get": {
                 "operationId": "audios.index",
@@ -1152,6 +1219,9 @@
                     "path": {
                         "type": "string"
                     },
+                    "url": {
+                        "type": "string"
+                    },
                     "mode_id": {
                         "type": [
                             "integer",
@@ -1172,6 +1242,7 @@
                     "id",
                     "name",
                     "path",
+                    "url",
                     "mode_id",
                     "created_at",
                     "updated_at"
@@ -1741,8 +1812,8 @@
                     }
                 }
             },
-            "AuthorizationException": {
-                "description": "Authorization error",
+            "ModelNotFoundException": {
+                "description": "Not found",
                 "content": {
                     "application/json": {
                         "schema": {
@@ -1760,8 +1831,8 @@
                     }
                 }
             },
-            "ModelNotFoundException": {
-                "description": "Not found",
+            "AuthorizationException": {
+                "description": "Authorization error",
                 "content": {
                     "application/json": {
                         "schema": {

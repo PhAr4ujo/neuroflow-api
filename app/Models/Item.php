@@ -24,6 +24,7 @@ class Item extends Model
             ['name' => 'Core', 'route' => '/core'],
             ['name' => 'Flows', 'route' => '/flows'],
             ['name' => 'Modes', 'route' => '/modes'],
+            ['name' => 'Audios', 'route' => '/audios'],
             ['name' => 'Settings', 'route' => 'settings'],
         ];
     }

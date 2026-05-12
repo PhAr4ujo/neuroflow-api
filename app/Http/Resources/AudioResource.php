@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\URL;
 
 class AudioResource extends ApiResource
 {
@@ -15,6 +16,7 @@ class AudioResource extends ApiResource
             'id' => $this->id,
             'name' => $this->name,
             'path' => $this->path,
+            'url' => URL::temporarySignedRoute('audios.stream', now()->addHour(), ['audio' => $this->id]),
             'mode_id' => $this->mode_id,
             'mode' => ModeResource::make($this->whenLoaded('mode')),
             'created_at' => $this->created_at?->toISOString(),

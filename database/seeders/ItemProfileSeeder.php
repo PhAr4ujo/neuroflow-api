@@ -17,7 +17,7 @@ class ItemProfileSeeder extends Seeder
 
         $accessByProfile = [
             Profile::ADMIN_SLUG => $items->pluck('id')->all(),
-            Profile::USER_SLUG => $items->whereIn('name', ['Core', 'Flows', 'Modes', 'Settings'])->pluck('id')->all(),
+            Profile::USER_SLUG => $items->whereIn('name', ['Core', 'Flows', 'Modes', 'Audios', 'Settings'])->pluck('id')->all(),
         ];
 
         foreach ($accessByProfile as $profileSlug => $itemIds) {

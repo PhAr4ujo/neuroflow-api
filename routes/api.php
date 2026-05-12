@@ -29,6 +29,10 @@ Route::prefix('auth')->group(function (): void {
     });
 });
 
+Route::get('/audios/{audio}/stream', [AudioController::class, 'stream'])
+    ->middleware('signed')
+    ->name('audios.stream');
+
 Route::middleware('auth:sanctum')->group(function (): void {
     Route::apiResource('audios', AudioController::class);
     Route::apiResource('items', ItemController::class)->only(['index', 'show']);
