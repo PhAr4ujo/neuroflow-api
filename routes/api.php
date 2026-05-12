@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\ItemController;
+use App\Http\Controllers\ModeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -29,6 +30,7 @@ Route::prefix('auth')->group(function (): void {
 
 Route::middleware('auth:sanctum')->group(function (): void {
     Route::apiResource('items', ItemController::class)->only(['index', 'show']);
+    Route::apiResource('modes', ModeController::class);
     Route::apiResource('profiles', ProfileController::class)->only(['index', 'show']);
     Route::apiResource('users', UserController::class);
     Route::get('/user', [AuthController::class, 'currentUser']);
