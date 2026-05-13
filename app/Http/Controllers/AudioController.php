@@ -26,17 +26,31 @@ class AudioController extends Controller
     /**
      * List the available audios.
      */
-    public function index(): AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
+        return AudioResource::collection(
+            $this->audioService->paginateAudios($this->paginationAmount($request)),
+        );
+    }
+
+    /**
+     * List every available audio without pagination.
+     */
+    public function getAll(): AnonymousResourceCollection
+    {
+        $this->authorize('viewAny', Audio::class);
+
         return AudioResource::collection($this->audioService->getAllAudios());
     }
 
     /**
      * List the available audios for a mode.
      */
-    public function byMode(Mode $mode): AnonymousResourceCollection
+    public function byMode(Request $request, Mode $mode): AnonymousResourceCollection
     {
-        return AudioResource::collection($this->audioService->getByMode($mode->id));
+        return AudioResource::collection(
+            $this->audioService->paginateByMode($mode->id, $this->paginationAmount($request)),
+        );
     }
 
     /**

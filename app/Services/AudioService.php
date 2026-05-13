@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Audio;
 use App\Repositories\Interfaces\IAudioRepository;
 use App\Services\Interfaces\IAudioService;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
@@ -31,12 +32,22 @@ class AudioService extends Service implements IAudioService
         return $this->audioRepository->getAllWithMode();
     }
 
+    public function paginateAudios(int $paginationAmount = 15): LengthAwarePaginator
+    {
+        return $this->audioRepository->paginateWithMode($paginationAmount);
+    }
+
     /**
      * @return Collection<int, Audio>
      */
     public function getByMode(int $modeId): Collection
     {
         return $this->audioRepository->getByMode($modeId);
+    }
+
+    public function paginateByMode(int $modeId, int $paginationAmount = 15): LengthAwarePaginator
+    {
+        return $this->audioRepository->paginateByMode($modeId, $paginationAmount);
     }
 
     public function createAudio(array $data, UploadedFile $file): Audio

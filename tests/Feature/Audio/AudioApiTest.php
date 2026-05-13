@@ -50,11 +50,45 @@ class AudioApiTest extends TestCase
 
         $response
             ->assertOk()
+            ->assertJsonPath('meta.per_page', 15)
+            ->assertJsonPath('meta.total', 2)
             ->assertJsonFragment(['name' => 'Focus Track', 'path' => 'audios/focus-track.mp3'])
             ->assertJsonFragment(['name' => 'Neutral Track', 'path' => 'audios/neutral-track.mp3'])
             ->assertJsonFragment(['name' => 'Focus']);
 
         $this->assertStringContainsString("/api/audios/{$response->json('data.0.id')}/stream?", $response->json('data.0.url'));
+    }
+
+    public function test_authenticated_user_can_paginate_audios(): void
+    {
+        Sanctum::actingAs(User::factory()->create());
+
+        Audio::factory()->count(3)->create();
+
+        $response = $this->getJson('/api/audios?pagination_amount=2');
+
+        $response
+            ->assertOk()
+            ->assertJsonCount(2, 'data')
+            ->assertJsonPath('meta.current_page', 1)
+            ->assertJsonPath('meta.per_page', 2)
+            ->assertJsonPath('meta.total', 3);
+
+        $this->getJson('/api/audios?pagination_amount=2&page=2')
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('meta.current_page', 2);
+    }
+
+    public function test_authenticated_user_can_get_all_audios_without_pagination(): void
+    {
+        Sanctum::actingAs(User::factory()->create());
+
+        Audio::factory()->count(3)->create();
+
+        $this->getJson('/api/audios/all?pagination_amount=1')
+            ->assertOk()
+            ->assertJsonCount(3, 'data');
     }
 
     public function test_authenticated_user_can_list_audios_by_mode(): void
@@ -88,6 +122,7 @@ class AudioApiTest extends TestCase
         $response
             ->assertOk()
             ->assertJsonCount(2, 'data')
+            ->assertJsonPath('meta.total', 2)
             ->assertJsonFragment(['name' => 'Focus Track One', 'mode_id' => $focusMode->id])
             ->assertJsonFragment(['name' => 'Focus Track Two', 'mode_id' => $focusMode->id])
             ->assertJsonMissing(['name' => 'Calm Track'])

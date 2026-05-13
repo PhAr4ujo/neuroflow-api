@@ -3,12 +3,22 @@
 namespace App\Repositories\Interfaces;
 
 use App\Models\User;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Laravel\Sanctum\NewAccessToken;
 
 interface IUserRepository extends IRepository
 {
     public function getAllWithProfile(): Collection;
+
+    public function paginateWithProfile(int $paginationAmount): LengthAwarePaginator;
+
+    public function searchByNameOrEmail(
+        ?string $search,
+        ?string $name,
+        ?string $email,
+        int $paginationAmount,
+    ): LengthAwarePaginator;
 
     public function findByEmail(string $email): ?User;
 

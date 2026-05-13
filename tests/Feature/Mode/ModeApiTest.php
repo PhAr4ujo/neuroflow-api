@@ -46,8 +46,42 @@ class ModeApiTest extends TestCase
 
         $response
             ->assertOk()
+            ->assertJsonPath('meta.per_page', 15)
+            ->assertJsonPath('meta.total', 2)
             ->assertJsonFragment(['name' => 'Focus', 'color' => '#3366FF'])
             ->assertJsonFragment(['name' => 'Calm', 'color' => '#22AA88']);
+    }
+
+    public function test_authenticated_user_can_paginate_modes(): void
+    {
+        Sanctum::actingAs(User::factory()->create());
+
+        Mode::factory()->count(3)->create();
+
+        $response = $this->getJson('/api/modes?pagination_amount=2');
+
+        $response
+            ->assertOk()
+            ->assertJsonCount(2, 'data')
+            ->assertJsonPath('meta.current_page', 1)
+            ->assertJsonPath('meta.per_page', 2)
+            ->assertJsonPath('meta.total', 3);
+
+        $this->getJson('/api/modes?pagination_amount=2&page=2')
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('meta.current_page', 2);
+    }
+
+    public function test_authenticated_user_can_get_all_modes_without_pagination(): void
+    {
+        Sanctum::actingAs(User::factory()->create());
+
+        Mode::factory()->count(3)->create();
+
+        $this->getJson('/api/modes/all?pagination_amount=1')
+            ->assertOk()
+            ->assertJsonCount(3, 'data');
     }
 
     public function test_mode_seeder_creates_default_modes_idempotently(): void

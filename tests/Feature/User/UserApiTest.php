@@ -47,8 +47,64 @@ class UserApiTest extends TestCase
 
         $response
             ->assertOk()
+            ->assertJsonPath('meta.per_page', 15)
+            ->assertJsonPath('meta.total', 3)
             ->assertJsonFragment(['id' => $admin->id, 'email' => 'admin@example.com'])
             ->assertJsonFragment(['id' => $user->id, 'email' => 'user@example.com']);
+    }
+
+    public function test_admin_can_get_all_users_without_pagination(): void
+    {
+        $admin = User::factory()->admin()->create();
+        User::factory()->count(2)->create();
+
+        Sanctum::actingAs($admin);
+
+        $this->getJson('/api/users/all?pagination_amount=1')
+            ->assertOk()
+            ->assertJsonCount(3, 'data');
+    }
+
+    public function test_admin_can_search_users_by_name_and_email(): void
+    {
+        $admin = User::factory()->admin()->create([
+            'name' => 'Root Admin',
+            'email' => 'admin@example.com',
+        ]);
+        User::factory()->create([
+            'name' => 'Alice Focus',
+            'email' => 'alice@example.com',
+        ]);
+        User::factory()->create([
+            'name' => 'Bob Builder',
+            'email' => 'bob.focus@example.com',
+        ]);
+        User::factory()->create([
+            'name' => 'Charlie Calm',
+            'email' => 'charlie@example.com',
+        ]);
+
+        Sanctum::actingAs(User::factory()->create());
+
+        $this->getJson('/api/users/search?search=focus')
+            ->assertForbidden();
+
+        Sanctum::actingAs($admin);
+
+        $response = $this->getJson('/api/users/search?search=focus&pagination_amount=10');
+
+        $response
+            ->assertOk()
+            ->assertJsonCount(2, 'data')
+            ->assertJsonPath('meta.total', 2)
+            ->assertJsonFragment(['name' => 'Alice Focus', 'email' => 'alice@example.com'])
+            ->assertJsonFragment(['name' => 'Bob Builder', 'email' => 'bob.focus@example.com'])
+            ->assertJsonMissing(['name' => 'Charlie Calm']);
+
+        $this->getJson('/api/users/search?name=alice&email=example.com')
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonFragment(['name' => 'Alice Focus', 'email' => 'alice@example.com']);
     }
 
     public function test_admin_can_create_a_user(): void
