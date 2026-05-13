@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AudioController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ModeController;
@@ -28,10 +29,20 @@ Route::prefix('auth')->group(function (): void {
     });
 });
 
+Route::get('/audios/{audio}/stream', [AudioController::class, 'stream'])
+    ->middleware('signed')
+    ->name('audios.stream');
+
 Route::middleware('auth:sanctum')->group(function (): void {
+    Route::get('/audios/all', [AudioController::class, 'getAll']);
+    Route::apiResource('audios', AudioController::class);
     Route::apiResource('items', ItemController::class)->only(['index', 'show']);
+    Route::get('/modes/all', [ModeController::class, 'getAll']);
+    Route::get('/modes/{mode}/audios', [AudioController::class, 'byMode']);
     Route::apiResource('modes', ModeController::class);
     Route::apiResource('profiles', ProfileController::class)->only(['index', 'show']);
+    Route::get('/users/all', [UserController::class, 'getAll']);
+    Route::get('/users/search', [UserController::class, 'search']);
     Route::apiResource('users', UserController::class);
     Route::get('/user', [AuthController::class, 'currentUser']);
 });

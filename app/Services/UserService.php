@@ -9,6 +9,7 @@ use App\Repositories\Interfaces\IUserRepository;
 use App\Services\Interfaces\IUserService;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Auth\Events\Verified;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -29,6 +30,25 @@ class UserService extends Service implements IUserService
     public function getAllUsers(): Collection
     {
         return $this->userRepository->getAllWithProfile();
+    }
+
+    public function paginateUsers(int $paginationAmount = 15): LengthAwarePaginator
+    {
+        return $this->userRepository->paginateWithProfile($paginationAmount);
+    }
+
+    public function searchByNameOrEmail(
+        ?string $search,
+        ?string $name,
+        ?string $email,
+        int $paginationAmount = 15,
+    ): LengthAwarePaginator {
+        return $this->userRepository->searchByNameOrEmail(
+            $search,
+            $name,
+            $email,
+            $paginationAmount,
+        );
     }
 
     public function createUser(array $data): User

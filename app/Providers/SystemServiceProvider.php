@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Services\AudioService;
+use App\Services\Interfaces\IAudioService;
 use App\Services\Interfaces\IItemService;
 use App\Services\Interfaces\IModeService;
 use App\Services\Interfaces\IProfileService;
@@ -19,6 +21,7 @@ class SystemServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->bind(IAudioService::class, AudioService::class);
         $this->app->bind(IItemService::class, ItemService::class);
         $this->app->bind(IModeService::class, ModeService::class);
         $this->app->bind(IProfileService::class, ProfileService::class);

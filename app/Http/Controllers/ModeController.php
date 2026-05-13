@@ -7,6 +7,7 @@ use App\Http\Requests\Mode\UpdateModeRequest;
 use App\Http\Resources\ModeResource;
 use App\Models\Mode;
 use App\Services\Interfaces\IModeService;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response as HttpResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,9 +23,21 @@ class ModeController extends Controller
     /**
      * List the available application modes.
      */
-    public function index(): AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
-        return ModeResource::collection($this->modeService->getAll());
+        return ModeResource::collection(
+            $this->modeService->paginateModes($this->paginationAmount($request)),
+        );
+    }
+
+    /**
+     * List every application mode without pagination.
+     */
+    public function getAll(): AnonymousResourceCollection
+    {
+        $this->authorize('viewAny', Mode::class);
+
+        return ModeResource::collection($this->modeService->getAllModes());
     }
 
     /**

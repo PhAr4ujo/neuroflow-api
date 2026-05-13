@@ -7,6 +7,7 @@ use App\Http\Requests\User\UpdateUserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Services\Interfaces\IUserService;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response as HttpResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,9 +27,38 @@ class UserController extends Controller
      * - Admin profile: can list every user.
      * - User profile: cannot list users. Use `GET /api/user` or `GET /api/users/{user}` for the authenticated user instead.
      */
-    public function index(): AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
+        return UserResource::collection(
+            $this->userService->paginateUsers($this->paginationAmount($request)),
+        );
+    }
+
+    /**
+     * List every user without pagination.
+     */
+    public function getAll(): AnonymousResourceCollection
+    {
+        $this->authorize('viewAny', User::class);
+
         return UserResource::collection($this->userService->getAllUsers());
+    }
+
+    /**
+     * Search users by name and/or email.
+     */
+    public function search(Request $request): AnonymousResourceCollection
+    {
+        $this->authorize('viewAny', User::class);
+
+        return UserResource::collection(
+            $this->userService->searchByNameOrEmail(
+                $this->nullableQueryString($request, 'search'),
+                $this->nullableQueryString($request, 'name'),
+                $this->nullableQueryString($request, 'email'),
+                $this->paginationAmount($request),
+            ),
+        );
     }
 
     /**
@@ -93,5 +123,12 @@ class UserController extends Controller
         $this->userService->deleteUser($user);
 
         return response()->noContent();
+    }
+
+    private function nullableQueryString(Request $request, string $key): ?string
+    {
+        $value = trim((string) $request->query($key, ''));
+
+        return $value === '' ? null : $value;
     }
 }

@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Models\Mode;
 use App\Repositories\Interfaces\IModeRepository;
 use App\Services\Interfaces\IModeService;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 
 class ModeService extends Service implements IModeService
@@ -13,6 +15,16 @@ class ModeService extends Service implements IModeService
         private readonly IModeRepository $modeRepository,
     ) {
         parent::__construct($modeRepository);
+    }
+
+    public function getAllModes(): Collection
+    {
+        return $this->modeRepository->getAll();
+    }
+
+    public function paginateModes(int $paginationAmount = 15): LengthAwarePaginator
+    {
+        return $this->modeRepository->paginate($paginationAmount);
     }
 
     public function createMode(array $data): Mode
